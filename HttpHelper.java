@@ -64,38 +64,77 @@ class Infobox{
 	String Birthday;
 	String placeOfBirth;
 	Death death;
-	ArrayList<String> siblings;
-	ArrayList<String> spouses;
+	ArrayList<String> siblings = new ArrayList<String>();
+	ArrayList<String> spouses = new ArrayList<String>();
 	String description;
+	ArrayList<Leadership> leadership = new ArrayList<Leadership>();
+	ArrayList<String> founded = new ArrayList<String>();
 	public Infobox(JSONObject obj){
 		this.obj=obj;
 		getName();
-	}
-	class Death{
-		String place;
-		String date;
-		String cause;
-		public Death(String place,String date,String cause){
-			this.place=place;
-			this.date=date;
-			this.cause=cause;
-		}
+		getLeadership();
+		getFounded();
 	}
 	private void getName(){
-		name = get1Text("/type/object/name");
+		name = get1Text(obj,"/type/object/name");
 	}
-	private ArrayList<JSONObject> get1l(String name){
+	private void getLeadership(){
+		ArrayList<JSONObject> list = get1l(obj,"/business/board_member/leader_of");
+		for(JSONObject jo:list){
+			leadership.add(new Leadership(get1Text(jo,"/organization/leadership/from"),
+					get1Text(jo,"/organization/leadership/to"),
+					get1Text(jo,"/organization/leadership/organization"),
+					get1Text(jo,"/organization/leadership/role"),
+					get1Text(jo,"/organization/leadership/title")));
+		}
+	}
+	private void getFounded(){
+		founded.addAll(get1TextArray(obj,"/organization/organization_founder/organizations_founded"));
+	}
+	private ArrayList<JSONObject> get1l(JSONObject jo,String name){
 		ArrayList<JSONObject> result = new ArrayList<JSONObject>();
-		JSONArray ja = obj.getJSONObject("property").getJSONObject(name).getJSONArray("values");
+		JSONArray ja = jo.getJSONObject("property").getJSONObject(name).getJSONArray("values");
 		for(int i=0;i<ja.length();i++){
 			result.add(ja.getJSONObject(i));
 		}
 		return result;
 	}
-	private String get1Text(String name){
-		if(!get1l(name).isEmpty()){
-			return get1l(name).get(0).getString("text");
+	private String get1Text(JSONObject jo,String name){
+		if(!get1l(jo,name).isEmpty()){
+			return get1l(jo,name).get(0).getString("text");
 		}
 		return null;
+	}
+	private ArrayList<String> get1TextArray(JSONObject jo,String name){
+		ArrayList<JSONObject> jsonArray=get1l(jo,name);
+		ArrayList<String> result = new ArrayList<String>();
+		for(JSONObject subJo:jsonArray){
+			result.add(subJo.getString("text"));
+		}
+		return result;
+	}
+}
+class Leadership{
+	String from;
+	String to;
+	String organization;
+	String role;
+	String title;
+	public Leadership(String from, String to, String organization,String role,String title){
+		this.from = from;
+		this.to=to;
+		this.organization =organization;
+		this.role=role;
+		this.title=title;
+	}
+}
+class Death{
+	String place;
+	String date;
+	String cause;
+	public Death(String place,String date,String cause){
+		this.place=place;
+		this.date=date;
+		this.cause=cause;
 	}
 }
