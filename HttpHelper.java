@@ -40,14 +40,8 @@ class FreeBase{
 		}
 		return null;
 	}
-	static public JSONObject topic(String query){
-		try {
-			return new JSONObject(HttpHelper.query(searchPrefix+URLEncoder.encode(query, "ISO-8859-1")+"?key="+key));
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	static public Infobox topic(String query){
+		return new Infobox(new JSONObject(HttpHelper.query(topicPrefix+query+"?key="+key)));
 	}
 }
 class Entity{
@@ -62,5 +56,46 @@ class Entity{
 			entityList.add(new Entity(ja.getJSONObject(i).getString("mid")));
 		}
 		return entityList;
+	}
+}
+class Infobox{
+	JSONObject obj;
+	String name;
+	String Birthday;
+	String placeOfBirth;
+	Death death;
+	ArrayList<String> siblings;
+	ArrayList<String> spouses;
+	String description;
+	public Infobox(JSONObject obj){
+		this.obj=obj;
+		getName();
+	}
+	class Death{
+		String place;
+		String date;
+		String cause;
+		public Death(String place,String date,String cause){
+			this.place=place;
+			this.date=date;
+			this.cause=cause;
+		}
+	}
+	private void getName(){
+		name = get1Text("/type/object/name");
+	}
+	private ArrayList<JSONObject> get1l(String name){
+		ArrayList<JSONObject> result = new ArrayList<JSONObject>();
+		JSONArray ja = obj.getJSONObject("property").getJSONObject(name).getJSONArray("values");
+		for(int i=0;i<ja.length();i++){
+			result.add(ja.getJSONObject(i));
+		}
+		return result;
+	}
+	private String get1Text(String name){
+		if(!get1l(name).isEmpty()){
+			return get1l(name).get(0).getString("text");
+		}
+		return null;
 	}
 }
