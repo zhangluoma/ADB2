@@ -69,12 +69,29 @@ class Infobox{
 	String description;
 	ArrayList<Leadership> leadership = new ArrayList<Leadership>();
 	ArrayList<String> founded = new ArrayList<String>();
+	ArrayList<String> championshipL; 
+	String sport;
+	String slogan;
+	
 	public Infobox(JSONObject obj){
 		this.obj=obj;
 		getName();
-		getLeadership();
-		getFounded();
+		//getLeadership();
+		//getFounded();
+		getChampionship();
+		//getSport();
+		//getSlogan();
 	}
+	private void getChampionship(){
+		championshipL = get1TextArray(obj,"/sports/sports_league/championship");
+	}
+	private void getSport(){
+		sport = get1Text(obj,"/sports/sports_league/sport");
+	}
+	private void getSlogan(){
+		slogan = get1Text(obj,"/organization/organization/slogan");
+	}
+	
 	private void getName(){
 		name = get1Text(obj,"/type/object/name");
 	}
@@ -92,10 +109,14 @@ class Infobox{
 		founded.addAll(get1TextArray(obj,"/organization/organization_founder/organizations_founded"));
 	}
 	private ArrayList<JSONObject> get1l(JSONObject jo,String name){
-		ArrayList<JSONObject> result = new ArrayList<JSONObject>();
-		JSONArray ja = jo.getJSONObject("property").getJSONObject(name).getJSONArray("values");
-		for(int i=0;i<ja.length();i++){
-			result.add(ja.getJSONObject(i));
+		ArrayList<JSONObject> result = new ArrayList<JSONObject>();	
+		try{
+			JSONArray ja = jo.getJSONObject("property").getJSONObject(name).getJSONArray("values");
+			for(int i=0;i<ja.length();i++){
+				result.add(ja.getJSONObject(i));
+			}
+		}catch(Exception e){
+			return result;
 		}
 		return result;
 	}
@@ -108,8 +129,10 @@ class Infobox{
 	private ArrayList<String> get1TextArray(JSONObject jo,String name){
 		ArrayList<JSONObject> jsonArray=get1l(jo,name);
 		ArrayList<String> result = new ArrayList<String>();
-		for(JSONObject subJo:jsonArray){
-			result.add(subJo.getString("text"));
+		if(jsonArray!=null){
+			for(JSONObject subJo:jsonArray){
+				result.add(subJo.getString("text"));
+			}
 		}
 		return result;
 	}
