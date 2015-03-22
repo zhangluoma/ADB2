@@ -6,7 +6,6 @@ public class Test {
 	public static void main(String[] args){
 		Infobox ib =null;
 		for(Entity e : FreeBase.search("Michael Jordan")){
-			System.out.println("a");
 			try {
 				ib = FreeBase.topic(e.mid);
 			}catch (NoTypeException e1) {
