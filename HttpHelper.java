@@ -66,8 +66,14 @@ class Infobox{
 	Death death;
 	ArrayList<String> siblings = new ArrayList<String>();
 	ArrayList<String> spouses = new ArrayList<String>();
+	ArrayList<String> books = new ArrayList<String>();
+	ArrayList<String> bookAboutAuthor = new ArrayList<String>();
+	ArrayList<String> influenced = new ArrayList<String>();
+	ArrayList<String> influencedBy = new ArrayList<String>();
+	ArrayList<Film> filmsParticipated = new ArrayList<Film>();
 	String description;
-	ArrayList<Leadership> leadership = new ArrayList<Leadership>();
+	ArrayList<OrganizationRole> leadership = new ArrayList<OrganizationRole>();
+	ArrayList<OrganizationRole> boardMembers = new ArrayList<OrganizationRole>();
 	ArrayList<String> founded = new ArrayList<String>();
 	ArrayList<String> championshipL; 
 	String sport;
@@ -76,11 +82,15 @@ class Infobox{
 	public Infobox(JSONObject obj){
 		this.obj=obj;
 		getName();
-		//getLeadership();
+		getLeadership();
 		//getFounded();
 		getChampionship();
 		//getSport();
 		//getSlogan();
+		getDeath();
+		getSiblings();
+		getSpouses();
+		getBoardMember();
 	}
 	private void getChampionship(){
 		championshipL = get1TextArray(obj,"/sports/sports_league/championship");
@@ -95,14 +105,62 @@ class Infobox{
 	private void getName(){
 		name = get1Text(obj,"/type/object/name");
 	}
+	private void getBirth(){
+		name = get1Text(obj,"/people/person/date_of_birth");
+	}
+	private void getPlaceOfBirth(){
+		name = get1Text(obj,"/people/person/place_of_birth");
+	}
+	private void getDeath(){
+		if(get1Text(obj,"/people/deceased_person/date_of_death")!=null){
+			death = new Death(get1Text(obj,"/people/deceased_person/place_of_death"),
+					get1Text(obj,"/people/deceased_person/date_of_death"),
+					get1Text(obj,"/people/deceased_person/cause_of_death"));
+		}
+	}
+	public void getSiblings(){
+		siblings=get1TextArray(obj,"/people/person/sibling_s");
+	}
+	public void getSpouses(){
+		spouses = get1TextArray(obj,"/people/person/spouse_s");
+	}
+	public void getBooks(){
+		books = get1TextArray(obj,"/book/author/works_written");
+	}
+	public void getBooksAboutAuthor(){
+		bookAboutAuthor = get1TextArray(obj,"/book/book_subject/works");
+	}
+	public void getInfluenced(){
+		influenced = get1TextArray(obj,"/influence/influence_node/influenced");
+	}
+	public void getInfluencedBy(){
+		influencedBy = get1TextArray(obj,"/influence/influence_node/influenced_by");
+	}
+	public void getFilm(){
+		ArrayList<JSONObject> list = get1l(obj,"/film/actor/film");
+		for(JSONObject jo:list){
+			filmsParticipated.add(new Film(get1Text(jo,"/film/performance/film"),
+					get1Text(jo,"/film/performance/character")));
+		}
+	}
 	private void getLeadership(){
 		ArrayList<JSONObject> list = get1l(obj,"/business/board_member/leader_of");
 		for(JSONObject jo:list){
-			leadership.add(new Leadership(get1Text(jo,"/organization/leadership/from"),
+			leadership.add(new OrganizationRole(get1Text(jo,"/organization/leadership/from"),
 					get1Text(jo,"/organization/leadership/to"),
 					get1Text(jo,"/organization/leadership/organization"),
 					get1Text(jo,"/organization/leadership/role"),
 					get1Text(jo,"/organization/leadership/title")));
+		}
+	}
+	private void getBoardMember(){
+		ArrayList<JSONObject> list = get1l(obj,"/business/board_member/organization_board_memberships");
+		for(JSONObject jo:list){
+			boardMembers.add(new OrganizationRole(get1Text(jo,"/organization/organization_board_membership/from"),
+					get1Text(jo,"/organization/organization_board_membership/to"),
+					get1Text(jo,"/organization/organization_board_membership/organization"),
+					get1Text(jo,"/organization/organization_board_membership/role"),
+					get1Text(jo,"/organization/organization_board_membership/title")));
 		}
 	}
 	private void getFounded(){
@@ -137,13 +195,13 @@ class Infobox{
 		return result;
 	}
 }
-class Leadership{
+class OrganizationRole{
 	String from;
 	String to;
 	String organization;
 	String role;
 	String title;
-	public Leadership(String from, String to, String organization,String role,String title){
+	public OrganizationRole(String from, String to, String organization,String role,String title){
 		this.from = from;
 		this.to=to;
 		this.organization =organization;
@@ -159,5 +217,13 @@ class Death{
 		this.place=place;
 		this.date=date;
 		this.cause=cause;
+	}
+}
+class Film{
+	String name;
+	String character;
+	public Film(String name,String character){
+		this.name=name;
+		this.character=character;
 	}
 }
