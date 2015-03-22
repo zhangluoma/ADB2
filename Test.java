@@ -1,13 +1,23 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.json.JSONException;
 public class Test {
 	public static void main(String[] args){
-		String b = FreeBase.topic("/m/0jm3v").arena;
-		ArrayList<String> a = FreeBase.topic("/m/0jm3v").championships;
-		ArrayList<Roster> c = FreeBase.topic("/m/0jm3v").roster;
-		System.out.println(b);
-		for(String l:a){
-			System.out.println(l);
+		Infobox ib =null;
+		for(Entity e : FreeBase.search("Michael Jordan")){
+			System.out.println("a");
+			try {
+				ib = FreeBase.topic(e.mid);
+			}catch (NoTypeException e1) {
+				// TODO Auto-generated catch block
+				continue;
+			}
+			break;
 		}
-		System.out.println(c.get(0).name);
+		for(String str:ib.types){
+			System.out.println(str);
+		}
+		System.out.println(ib.name);
 	}
 }

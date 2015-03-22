@@ -4,8 +4,11 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 public class HttpHelper{
 	public static String query(String tarUrl){
@@ -40,7 +43,7 @@ class FreeBase{
 		}
 		return null;
 	}
-	static public Infobox topic(String query){
+	static public Infobox topic(String query) throws JSONException, NoTypeException{
 		return new Infobox(new JSONObject(HttpHelper.query(topicPrefix+query+"?key="+key)));
 	}
 }
@@ -59,9 +62,25 @@ class Entity{
 	}
 }
 class Infobox{
+	HashSet<String> types = new HashSet<String>();
+	static Hashtable<String,String> typeMap = new Hashtable<String,String>(){
+		private static final long serialVersionUID = 1L;
+
+		{
+			put("/people/person","Person");
+			put("/book/author","Author");
+			put("/organization/organization_founder","BusinessPerson");
+			put("/business/board_member","BusinessPerson");
+			put("/film/actor","Actor");
+			put("/tv/tv_actor","Actor");
+			put("/sports/sports_league","League");
+			put("/sports/sports_team","SportsTeam");
+			put("/sports/professional_sports_team","SportsTeam");
+		}
+	};
 	JSONObject obj;
 	String name;
-	String Birthday;
+	String birthday;
 	String placeOfBirth;
 	Death death;
 	ArrayList<Coach> coach = new ArrayList<Coach>();
@@ -86,9 +105,12 @@ class Infobox{
 	String officialWebsite;
 	ArrayList<String> slogan = new ArrayList<String>();
 	ArrayList<String> locations = new ArrayList<String>();
-	String leagues;
-	public Infobox(JSONObject obj){
+	ArrayList<String> leagues = new ArrayList<String>();
+	public Infobox(JSONObject obj) throws NoTypeException{
 		this.obj=obj;
+		if(!checkType()){
+			throw new NoTypeException();
+		}
 		getBirth();
 		getName();
 		getLeadership();
@@ -115,10 +137,16 @@ class Infobox{
 	}
 	
 	private void getTeams(){
-		
+		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_league/teams");
+		for(JSONObject jo:list){
+			teams.add(get1Text(jo,"/sports/sports_league_participation/team"));
+		}
 	}
 	private void getLeagues(){
-		
+		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_team/league");
+		for(JSONObject jo:list){
+			leagues.add(get1Text(jo,"/sports/sports_league_participation/league"));
+		}
 	}
 	private void getLocations(){
 		locations = get1TextArray(obj,"/sports/sports_team/location");
@@ -152,10 +180,10 @@ class Infobox{
 		name = get1Text(obj,"/type/object/name");
 	}
 	private void getBirth(){
-		name = get1Text(obj,"/people/person/date_of_birth");
+		birthday = get1Text(obj,"/people/person/date_of_birth");
 	}
 	private void getPlaceOfBirth(){
-		name = get1Text(obj,"/people/person/place_of_birth");
+		placeOfBirth = get1Text(obj,"/people/person/place_of_birth");
 	}
 	public void getSiblings(){
 		siblings=get1TextArray(obj,"/people/person/sibling_s");
@@ -269,6 +297,19 @@ class Infobox{
 		}
 		return result;
 	}
+	private boolean checkType(){
+		ArrayList<JSONObject> jos = get1l(obj,"/type/object/type");
+		for(JSONObject jo:jos){
+			String id = jo.getString("id");
+			if(typeMap.get(id)!=null){
+				types.add(typeMap.get(id));
+			}
+		}
+		if(!types.isEmpty()){
+			return true;
+		}
+		return false;
+	}
 }
 class OrganizationRole{
 	String from;
@@ -328,3 +369,4 @@ class Roster{
 		this.to=to;
 	}
 }
+class NoTypeException extends Exception{};
