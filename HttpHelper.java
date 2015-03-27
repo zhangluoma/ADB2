@@ -10,6 +10,24 @@ import java.util.Hashtable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+/**
+ * 
+ * @author luomazhang
+ * a class used to send http request
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
 public class HttpHelper{
 	public static String query(String tarUrl){
 		//escape the query first
@@ -35,6 +53,11 @@ class NameQuery{
 		String fullQuery = "[{\"/organization/organization_founder/organizations_founded\": [{\"text~=\":"+terms+"}],\"mid\": [],}]";
 	}
 }
+
+/**
+ * @author luomazhang
+ * the class provides two methods for search and topic
+ */
 class FreeBase{
 	static String searchPrefix = "https://www.googleapis.com/freebase/v1/search?query=";
 	static String topicPrefix = "https://www.googleapis.com/freebase/v1/topic";
@@ -52,6 +75,10 @@ class FreeBase{
 		return new Infobox(new JSONObject(HttpHelper.query(topicPrefix+query+"?key="+key)));
 	}
 }
+/**
+ * @author luomazhang
+ * Entity used to obtain the JSOBObject fetched from freeBase with search
+ */
 class Entity{
 	String mid;
 	public Entity(String mid){
@@ -66,6 +93,35 @@ class Entity{
 		return entityList;
 	}
 }
+
+/**
+ * @author luomazhang
+ * infobox class to maintain all of the information we fetched using search()
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
+/**
+ * @author luomazhang
+ *
+ */
 class Infobox{
 	HashSet<String> types = new HashSet<String>();
 	StringBuffer result = new StringBuffer();
@@ -128,6 +184,11 @@ class Infobox{
 		t.addTuple(new ArrayList<String>(){{add("ohh");add("haha");}});*/
 		//sb = new TypeBox(60, "what?");
 	}
+	/**
+	 * constructor
+	 * @param obj
+	 * @throws NoTypeException
+	 */
 	public Infobox(JSONObject obj) throws NoTypeException{
 		this.obj=obj;
 		if(!checkType()){
@@ -163,6 +224,9 @@ class Infobox{
 		getFilm();
 		addFinalLine();
 	}
+	/**
+	 * fetch name from the object
+	 */
 	private void getName(){
 		name = get1Text(obj,"/type/object/name");
 		String t=name+"(";
@@ -178,6 +242,10 @@ class Infobox{
 		result.append(new TypeBox(length,t).content());
 		result.append(new ArrayBox(length,leftMargin, "Name", new ArrayList<String>(){{add(name);}}).content());
 	}
+	
+	/**
+	 * fetch team
+	 */
 	private void getTeams(){
 		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_league/teams");
 		for(JSONObject jo:list){
@@ -187,6 +255,9 @@ class Infobox{
 			append(new ArrayBox(length,leftMargin, "Teams", teams));
 		}
 	}
+	/**
+	 * fetch leagues
+	 */
 	private void getLeagues(){
 		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_team/league");
 		for(JSONObject jo:list){
@@ -196,84 +267,126 @@ class Infobox{
 			append(new ArrayBox(length,leftMargin, "Leagues", leagues));
 		}
 	}
+	/**
+	 * fetch locations
+	 */
 	private void getLocations(){
 		locations = get1TextArray(obj,"/sports/sports_team/location");
 		if(!locations.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Locations",locations));
 		}
 	}
+	/**
+	 * fetch description
+	 */
 	private void getDecription(){
 		description = get2Text(obj,"/common/topic/description");
 		if(description!=null){
 			append(new DescriptionBox(length,leftMargin, description));
 		}
 	}
+	/**
+	 * fetch web
+	 */
 	private void getWeb(){
 		officialWebsite = get1Text(obj,"/common/topic/official_website");
 		if(officialWebsite!=null){
 			append(new ArrayBox(length,leftMargin, "officialWebsite", new ArrayList<String>(){{add(officialWebsite);}}));
 		}
 	}
+	/**
+	 * fetch found
+	 */
 	private void getFound(){
 		foundTime = get1Text(obj,"/sports/sports_team/founded");
 		if(foundTime!=null){
 			append(new ArrayBox(length,leftMargin, "Found Time", new ArrayList<String>(){{add(foundTime);}}));
 		}
 	}
+	/**
+	 * fetch Arena
+	 */
 	private void getArena(){
 		arena = get1Text(obj,"/sports/sports_team/arena_stadium");
 		if(arena!=null){
 			append(new ArrayBox(length,leftMargin, "Arena", new ArrayList<String>(){{add(arena);}}));
 		}
 	}
+	/**
+	 * fetch Championship
+	 */
 	private void getChampionship(){
 		championship = get1TextArray(obj,"/sports/sports_league/championship");
 		if(!championship.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Championship", championship));
 		}
 	}
+	/**
+	 * fetch Championship
+	 */
 	private void getChampionships(){
 		championships = get1TextArray(obj,"/sports/sports_team/championships");
 		if(!championships.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Championships", championships));
 		}
 	}
+	/**
+	 * fetch getSport
+	 */
 	private void getSport(){
 		sport = get1Text(obj,"/sports/sports_league/sport");
 		if(sport!=null){
 			append(new ArrayBox(length,leftMargin, "Sport", new ArrayList<String>(){{add(sport);}}));
 		}
 	}
+	/**
+	 * fetch teamSport
+	 */
 	private void getTeamSport(){
 		sport = get1Text(obj,"/sports/sports_team/sport");
 		if(sport!=null){
 			append(new ArrayBox(length,leftMargin, "Sport", new ArrayList<String>(){{add(sport);}}));
 		}
 	}
+	/**
+	 * fetch getSlogan
+	 */
 	private void getSlogan(){
 		slogan = get1TextArray(obj,"/organization/organization/slogan");
 		if(!slogan.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Slogan", slogan));
 		}
 	}
+	/**
+	 * fetch getBirth
+	 */
 	private void getBirth(){
 		birthday = get1Text(obj,"/people/person/date_of_birth");
 		if(birthday!=null){
 			append(new ArrayBox(length,leftMargin, "Birthday", new ArrayList<String>(){{add(birthday);}}));
 		}
 	}
+	/**
+	 * fetch getPlaceOfBirth
+	 */
 	private void getPlaceOfBirth(){
 		placeOfBirth = get1Text(obj,"/people/person/place_of_birth");
 		if(placeOfBirth!=null){
 			append(new ArrayBox(length,leftMargin, "Place Of Birth", new ArrayList<String>(){{add(placeOfBirth);}}));
 		}
 	}
+	/**
+	 * fetch siblings
+	 */
 	public void getSiblings(){
 		siblings=get2TextArray(obj,"/people/person/sibling_s","/people/sibling_relationship/sibling");
 		if(!siblings.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Siblings", siblings));
 		}
 	}
+	/**
+	 * fetch spouses
+	 */
 	public void getSpouses(){
 		ArrayList<JSONObject> list = get1l(obj,"/people/person/spouse_s");
 		ArrayList<String> sp = new ArrayList<String>();
@@ -290,30 +403,45 @@ class Infobox{
 			append(new ArrayBox(length,leftMargin, "spouses", sp));
 		}
 	}
+	/**
+	 * fetch books
+	 */
 	public void getBooks(){
 		books = get1TextArray(obj,"/book/author/works_written");
 		if(!books.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Books", books));
 		}
 	}
+	/**
+	 * fetch booksAboutAuthors
+	 */
 	public void getBooksAboutAuthor(){
 		bookAboutAuthor = get1TextArray(obj,"/book/book_subject/works");
 		if(!bookAboutAuthor.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Books about", bookAboutAuthor));
 		}
 	}
+	/**
+	 * fetch influenced
+	 */
 	public void getInfluenced(){
 		influenced = get1TextArray(obj,"/influence/influence_node/influenced");
 		if(!influenced.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Influenced", influenced));
 		}
 	}
+	/**
+	 * fetch getInfluenced
+	 */
 	public void getInfluencedBy(){
 		influencedBy = get1TextArray(obj,"/influence/influence_node/influenced_by");
 		if(!influencedBy.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Influenced", influencedBy));
 		}
 	}
+	/**
+	 * fetch film
+	 */
 	public void getFilm(){
 		ArrayList<JSONObject> list = get1l(obj,"/film/actor/film");
 		for(JSONObject jo:list){
@@ -333,6 +461,9 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Films", t));
 		}
 	}
+	/**
+	 * fetch leadership
+	 */
 	private void getLeadership(){
 		ArrayList<JSONObject> list = get1l(obj,"/business/board_member/leader_of");
 		for(JSONObject jo:list){
@@ -359,6 +490,9 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Leadership", t));
 		}
 	}
+	/**
+	 * fetch boardMember
+	 */
 	private void getBoardMember(){
 		ArrayList<JSONObject> list = get1l(obj,"/business/board_member/organization_board_memberships");
 		for(JSONObject jo:list){
@@ -385,6 +519,9 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Board Member", t));
 		}
 	}
+	/**
+	 * fetch coach
+	 */
 	private void getCoach(){
 		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_team/coaches");
 		for(JSONObject jo:list){
@@ -410,6 +547,9 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Coach", t));
 		}
 	}
+	/**
+	 * fetch roster
+	 */
 	private void getRoster(){
 		ArrayList<JSONObject> list = get1l(obj,"/sports/sports_team/roster");
 		for(JSONObject jo:list){
@@ -438,6 +578,9 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Roster", t));
 		}
 	}
+	/**
+	 * fetch death
+	 */
 	private void getDeath(){
 		if(get1Text(obj,"/people/deceased_person/date_of_death")!=null){
 			death = new Death(get1Text(obj,"/people/deceased_person/place_of_death"),
@@ -457,12 +600,21 @@ class Infobox{
 			append(new TableBox(length,leftMargin, "Death", t));
 		}
 	}
+	/**
+	 * fetch founded
+	 */
 	private void getFounded(){
 		founded.addAll(get1TextArray(obj,"/organization/organization_founder/organizations_founded"));
 		if(!founded.isEmpty()){
 			append(new ArrayBox(length,leftMargin, "Founded", founded));
 		}
 	}
+	/**
+	 * get the JsonObjectArray in the first level with a name
+	 * @param jo target JSONObject 
+	 * @param name the key of the JSONObject
+	 * @return
+	 */
 	private ArrayList<JSONObject> get1l(JSONObject jo,String name){
 		ArrayList<JSONObject> result = new ArrayList<JSONObject>();	
 		try{
@@ -475,18 +627,36 @@ class Infobox{
 		}
 		return result;
 	}
+	/**
+	 * get the only element with its value in the first level of a JSONObject with a key name
+	 * @param jo
+	 * @param name the key
+	 * @return
+	 */
 	private String get2Text(JSONObject jo,String name){
 		if(!get1l(jo,name).isEmpty()){
 			return get1l(jo,name).get(0).getString("value");
 		}
 		return null;
 	}
+	/**
+	 * get the only element  with its text in the first level of a JSONObject with a key name
+	 * @param jo
+	 * @param name the key
+	 * @return
+	 */
 	private String get1Text(JSONObject jo,String name){
 		if(!get1l(jo,name).isEmpty()){
 			return get1l(jo,name).get(0).getString("text");
 		}
 		return null;
 	}
+	/**
+	 * get element ArrayList in the first level of a JSONObject with a key name
+	 * @param jo
+	 * @param name
+	 * @return
+	 */
 	private ArrayList<String> get1TextArray(JSONObject jo,String name){
 		ArrayList<JSONObject> jsonArray=get1l(jo,name);
 		ArrayList<String> result = new ArrayList<String>();
@@ -497,6 +667,13 @@ class Infobox{
 		}
 		return result;
 	}
+	/**
+	 * get element ArrayList in the second level of a JSONObject with two key names
+	 * @param jo
+	 * @param name
+	 * @param name2
+	 * @return
+	 */
 	private ArrayList<String> get2TextArray(JSONObject jo,String name,String name2){
 		ArrayList<JSONObject> jsonArray=get1l(jo,name);
 		ArrayList<String> result = new ArrayList<String>();
@@ -507,6 +684,10 @@ class Infobox{
 		}
 		return result;
 	}
+	/**
+	 * check the type of the object
+	 * @return
+	 */
 	private boolean checkType(){
 		ArrayList<JSONObject> jos = get1l(obj,"/type/object/type");
 		for(JSONObject jo:jos){
@@ -534,6 +715,11 @@ class Infobox{
 		result.append(" ");
 	}
 }
+/**
+ * this class is used for create the type box for the infobox
+ * @author luomazhang
+ *
+ */
 class TypeBox extends Box{
 	SingleBox basic;
 	public TypeBox(int length,String title){
@@ -548,6 +734,11 @@ class TypeBox extends Box{
 		return basic.toString();
 	}
 }
+/**
+ * description box
+ * @author luomazhang
+ *
+ */
 class DescriptionBox extends Box{
 	SingleBox basicBox;
 	int rightMargin = 2;
@@ -569,6 +760,11 @@ class DescriptionBox extends Box{
 		return basicBox.toString();
 	}
 }
+/**
+ * arrayBox
+ * @author luomazhang
+ *
+ */
 class ArrayBox extends Box{
 	SingleBox basicBox;
 	public ArrayBox(int length, int leftMargin,String title,ArrayList<String> textArray){
@@ -584,6 +780,11 @@ class ArrayBox extends Box{
 		return basicBox.toString();
 	}
 }
+/**
+ * box with table
+ * @author luomazhang
+ *
+ */
 class TableBox extends Box{
 	ArrayBox basicBox;
 	public TableBox(int length,int leftMargin,String title, Table table){
@@ -594,6 +795,11 @@ class TableBox extends Box{
 		return basicBox.content();
 	}
 }
+/**
+ * table object used to create table inside a box
+ * @author luomazhang
+ *
+ */
 class Table{
 	ArrayList<TableInfo> attributes= new ArrayList<TableInfo>();
 	ArrayList<ArrayList<String>> tuples = new ArrayList<ArrayList<String>>();
@@ -646,6 +852,11 @@ class Table{
 		}
 	}
 }
+/**
+ * store table information
+ * @author luomazhang
+ *
+ */
 class TableInfo{
 	String name;
 	int length;
@@ -654,9 +865,19 @@ class TableInfo{
 		this.length=length;
 	}
 }
+/**
+ * abstract box containing an abstract method
+ * @author luomazhang
+ *
+ */
 abstract class Box{
 	abstract public String content();
 }
+/**
+ * basic unit of a box object
+ * @author luomazhang
+ *
+ */
 class SingleBox{
 	private String title;
 	private String[] context;
@@ -724,6 +945,11 @@ class SingleBox{
 		}
 	}
 }
+/**
+ * object to hold organization roles
+ * @author luomazhang
+ *
+ */
 class OrganizationRole{
 	String from;
 	String to;
@@ -741,6 +967,11 @@ class OrganizationRole{
 		this.title=title;
 	}
 }
+/**
+ * class to store death information
+ * @author luomazhang
+ *
+ */
 class Death{
 	String place="";
 	String date="";
@@ -751,6 +982,11 @@ class Death{
 		if(cause!=null) this.cause=cause;
 	}
 }
+/**
+ * class to store film information
+ * @author luomazhang
+ *
+ */
 class Film{
 	String name;
 	String character;
@@ -759,6 +995,11 @@ class Film{
 		this.character=character;
 	}
 }
+/**
+ * class to store coach information
+ * @author luomazhang
+ *
+ */
 class Coach{
 	String name;
 	String position;
@@ -774,6 +1015,11 @@ class Coach{
 		this.to=to;
 	}
 }
+/**
+ * class to store roster
+ * @author luomazhang
+ *
+ */
 class Roster{
 	String name;
 	ArrayList<String> position;
@@ -802,6 +1048,11 @@ class Roster{
 		}
 	}
 }
+/**
+ *  class to store spouse
+ * @author luomazhang
+ *
+ */
 class Spouse{
 	String name;
 	String startDate;
