@@ -4,9 +4,9 @@ import java.util.HashSet;
 import org.json.JSONException;
 public class Test {
 	public static void main(String[] args){
-		Infobox ib =null;
-		for(Entity e : FreeBase.search("Michael Jordan")){
-			System.out.println("a");
+		//NameQuery.queryCreator("Microsoft");
+		Infobox ib =new Infobox();
+		for(Entity e : FreeBase.search("Bill Gates")){
 			try {
 				ib = FreeBase.topic(e.mid);
 			}catch (NoTypeException e1) {
@@ -15,9 +15,6 @@ public class Test {
 			}
 			break;
 		}
-		for(String str:ib.types){
-			System.out.println(str);
-		}
-		System.out.println(ib.name);
+		System.out.println(ib);
 	}
 }
